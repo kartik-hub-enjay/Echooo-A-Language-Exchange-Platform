@@ -48,7 +48,14 @@ const NotificationPage = () => {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className="avatar w-14 h-14 rounded-full bg-base-300">
-                              <img src={request.sender.profilePic} alt={request.sender.fullName} />
+                              <img 
+                                src={request.sender.profilePic} 
+                                alt={request.sender.fullName}
+                                loading="lazy"
+                                onError={(e) => {
+                                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(request.sender.fullName)}&background=random`;
+                                }}
+                              />
                             </div>
                             <div>
                               <h3 className="font-semibold">{request.sender.fullName}</h3>
@@ -91,10 +98,14 @@ const NotificationPage = () => {
                     <div key={notification._id} className="card bg-base-200 shadow-sm">
                       <div className="card-body p-4">
                         <div className="flex items-start gap-3">
-                          <div className="avatar mt-1 size-10 rounded-full">
+                          <div className="avatar mt-1 size-10 rounded-full bg-base-300">
                             <img
                               src={notification.recipient.profilePic}
                               alt={notification.recipient.fullName}
+                              loading="lazy"
+                              onError={(e) => {
+                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(notification.recipient.fullName)}&background=random`;
+                              }}
                             />
                           </div>
                           <div className="flex-1">

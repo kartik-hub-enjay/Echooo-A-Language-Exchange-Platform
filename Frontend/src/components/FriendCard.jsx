@@ -4,13 +4,21 @@ import { LANGUAGE_TO_FLAG } from '../constants';
 
 const FriendCard = ({friend}) => {
   return (
-    <div className='card bg-base-200 hover:shadow-md transition-shadow'>
-        <div className='card-body p-4'>
+    <div className='card bg-base-200 hover:shadow-md transition-shadow h-full'>
+        <div className='card-body p-4 flex flex-col'>
             {/* USER INFO */}
             <div className='flex items-center gap-3 mb-3'>
                 <div className='avatar'>
-                    <div className='w-12 h-12 rounded-full overflow-hidden'>
-                        <img src={friend.profilePic} alt={friend.fullName} className='w-full h-full object-cover' />
+                    <div className='w-12 h-12 rounded-full overflow-hidden bg-base-300'>
+                        <img 
+                            src={friend.profilePic} 
+                            alt={friend.fullName} 
+                            className='w-full h-full object-cover'
+                            loading="lazy"
+                            onError={(e) => {
+                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.fullName)}&background=random`;
+                            }}
+                        />
                     </div>
                 </div>
                 <h3 className='font-semibold truncate'>{friend.fullName}</h3>
@@ -27,7 +35,7 @@ const FriendCard = ({friend}) => {
                 </span>
             </div>
 
-            <Link to={`/chat/${friend._id}`} className="btn btn-outline w-full">
+            <Link to={`/chat/${friend._id}`} className="btn btn-outline w-full mt-auto">
             Message
             </Link>
         </div>

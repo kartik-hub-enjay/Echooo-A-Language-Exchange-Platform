@@ -26,8 +26,10 @@ export const generateStreamToken = (userId) => {
     try{
         //ensure userId is a string
         const userIdStr = userId.toString();
+        // The StreamChat token works for both chat and video SDK
         return streamClient.createToken(userIdStr);
     }catch(error){
-        console.error("Error generatig Stream token: ",error);
+        console.error("Error generating Stream token: ",error);
+        throw error;
     }
 };

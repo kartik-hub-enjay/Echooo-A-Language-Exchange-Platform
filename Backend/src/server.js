@@ -39,6 +39,15 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 
+// Request timeout middleware
+app.use((req, res, next) => {
+    res.setTimeout(30000, () => {
+        console.log('Request has timed out.');
+        res.status(408).send('Request timeout');
+    });
+    next();
+});
+
 // API Routes
 app.use("/api/auth",authRouter);
 app.use("/api/users",userRouter);
@@ -55,7 +64,12 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-app.listen(PORT,()=>{
-    console.log(`server started on port: ${PORT}`);
-    connectDB();
-})
+// Connect to database first, then start server
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server started on port: ${PORT}`);
+    });
+}).catch((error) => {
+    console.error("Failed to connect to database:", error);
+    process.exit(1);
+});
