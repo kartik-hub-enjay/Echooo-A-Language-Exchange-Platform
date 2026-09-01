@@ -18,20 +18,27 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 // CORS configuration - allow both local and production origins
-const allowedOrigins = [
+const configuredOrigins = [
     "http://localhost:5173",
-    "https://echooo-xiib.onrender.com"
-];
+    "http://localhost:3000",
+    "https://echooo-xiib.onrender.com",
+    process.env.FRONTEND_URL,
+    ...(process.env.FRONTEND_URLS || "").split(",").map((value) => value.trim()).filter(Boolean),
+].filter(Boolean);
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(null, true); // For now, allow all origins during development
+        if (configuredOrigins.includes(origin)) {
+            return callback(null, true);
         }
+
+        // Allow Vercel preview domains and other trusted frontends without blocking auth
+        if (origin.includes("vercel.app") || origin.includes("localhost") || origin.includes("127.0.0.1")) {
+            return callback(null, true);
+        }
+
+        callback(null, true);
     },
     credentials: true,
 }));
