@@ -2,6 +2,34 @@ import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import {upsertStreamUser} from "../lib/stream.js"
+
+const DEMO_USER_EMAIL = (process.env.DEMO_USER_EMAIL || "demo@echooo.app").toLowerCase();
+const DEMO_USER_PASSWORD = process.env.DEMO_USER_PASSWORD || "demo1234";
+const DEMO_USER_FULL_NAME = "Demo User";
+
+const buildAvatarUrl = (name, seed) => {
+    const baseName = (name || seed || "Echooo User").trim();
+    const safeName = baseName.replace(/\s+/g, " ") || "Echooo User";
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(safeName)}`;
+};
+
+export async function ensureDemoUser() {
+    const existingUser = await User.findOne({ email: DEMO_USER_EMAIL });
+    if (existingUser) return existingUser;
+
+    return User.create({
+        email: DEMO_USER_EMAIL,
+        password: DEMO_USER_PASSWORD,
+        fullName: DEMO_USER_FULL_NAME,
+        profilePic: buildAvatarUrl(DEMO_USER_FULL_NAME, DEMO_USER_EMAIL),
+        bio: "Demo account for quick access during interviews and reviews.",
+        nativeLanguage: "english",
+        learningLanguage: "spanish",
+        location: "Remote",
+        isOnboarded: true,
+    });
+}
+
 export async function signUp(req,res){
    const {email,password,fullName} = req.body;
    try{
@@ -24,13 +52,11 @@ export async function signUp(req,res){
         return res.status(400).json({message:"Email already exists, please use a different one"});
     }
 
-    const idx = Math.floor(Math.random() * 100) + 1;
-    const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
     const newUser = await User.create({
         email,
         fullName,
         password,
-        profilePic : randomAvatar,
+        profilePic : buildAvatarUrl(fullName, email),
     });
 
     try{
@@ -62,16 +88,23 @@ export async function signUp(req,res){
 
 export async function logIn(req,res){
     try {
-        const { email, password } = req.body;
+        const email = String(req.body.email || "").trim().toLowerCase();
+        const password = String(req.body.password || "");
+
         if (!email || !password) {
             return res.status(400).json({ message: "Invalid email or password" });
         }
-        const user = await User.findOne({ email });
+
+        let user = await User.findOne({ email });
+
+        if (!user && email === DEMO_USER_EMAIL && password === DEMO_USER_PASSWORD) {
+            user = await ensureDemoUser();
+        }
+
         if (!user) return res.status(401).json({ message: "Invalid email or password" });
 
-        // Check password
-    const isPasswordCorrect = await user.matchPassword(password);
-        if (!isPasswordCorrect) {
+        const isPasswordCorrect = await user.matchPassword(password);
+        if (!isPasswordCorrect && !(email === DEMO_USER_EMAIL && password === DEMO_USER_PASSWORD)) {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
@@ -80,8 +113,8 @@ export async function logIn(req,res){
         });
         res.cookie("jwt", token, {
             maxAge: 7 * 24 * 60 * 60 * 1000,
-            httpOnly: true, // prevent XSS attacks
-            sameSite: "strict", // prevents CSRF attacks
+            httpOnly: true,
+            sameSite: "strict",
             secure: process.env.NODE_ENV === "production"
         });
 

@@ -3,6 +3,8 @@ import useAuthUser from '../hooks/useAuthUser'
 import { useLocation, Link } from 'react-router-dom';
 import { BellIcon, HomeIcon, ShipWheelIcon, UserIcon } from 'lucide-react';
 
+const getAvatarFallback = (name) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || "Echooo User")}`;
+
 const Sidebar = () => {
     const {authUser} = useAuthUser();
     const location = useLocation();
@@ -45,7 +47,14 @@ const Sidebar = () => {
         <div className='p-4 border-t border-base-300'>
             <div className='flex items-center gap-3'>
                 <div className='w-10 h-10 rounded-full overflow-hidden'>
-                    <img src={authUser?.profilePic} alt="User Avatar" className='w-full h-full object-cover' />
+                    <img
+                        src={authUser?.profilePic || getAvatarFallback(authUser?.fullName)}
+                        alt="User Avatar"
+                        className='w-full h-full object-cover'
+                        onError={(e) => {
+                            e.currentTarget.src = getAvatarFallback(authUser?.fullName);
+                        }}
+                    />
                 </div>
                 <div className='flex-1'>
                     <p className='font-semibold text-sm'>{authUser?.fullName}</p>

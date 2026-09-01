@@ -17,6 +17,16 @@ const LoginPage = () => {
     loginMutation(loginData);
   };
 
+  const handleDemoLogin = () => {
+    const demoCredentials = {
+      email: "demo@echooo.app",
+      password: "demo1234",
+    };
+
+    setLoginData(demoCredentials);
+    loginMutation(demoCredentials);
+  };
+
   return (
     <div
       className="h-screen flex items-center justify-center p-4 sm:p-6 md:p-8"
@@ -93,6 +103,15 @@ const LoginPage = () => {
                       ) : (
                         "Sign In"
                       )}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-secondary w-full"
+                      onClick={handleDemoLogin}
+                      disabled={isLoading}
+                    >
+                      Use Demo Account
                     </button>
 
                     <div className="text-center mt-4">

@@ -95,12 +95,12 @@ const HomePage = () => {
                               <div className='avatar'>
                                 <div className='w-16 h-16 rounded-full overflow-hidden bg-base-300'>
                                   <img 
-                                    src={user.profilePic} 
+                                    src={user.profilePic || getAvatarFallback(user.fullName)} 
                                     alt={user.fullName} 
                                     className='w-full h-full object-cover'
                                     loading="lazy"
                                     onError={(e) => {
-                                      e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.fullName)}&background=random`;
+                                      e.currentTarget.src = getAvatarFallback(user.fullName);
                                     }}
                                   />
                                 </div>
@@ -171,3 +171,5 @@ const capitialize = (str) => {
   if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
+
+const getAvatarFallback = (name) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || "Echooo User")}`;

@@ -49,11 +49,11 @@ const NotificationPage = () => {
                           <div className="flex items-center gap-3">
                             <div className="avatar w-14 h-14 rounded-full bg-base-300">
                               <img 
-                                src={request.sender.profilePic} 
+                                src={request.sender.profilePic || getAvatarFallback(request.sender.fullName)} 
                                 alt={request.sender.fullName}
                                 loading="lazy"
                                 onError={(e) => {
-                                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(request.sender.fullName)}&background=random`;
+                                  e.currentTarget.src = getAvatarFallback(request.sender.fullName);
                                 }}
                               />
                             </div>
@@ -100,11 +100,11 @@ const NotificationPage = () => {
                         <div className="flex items-start gap-3">
                           <div className="avatar mt-1 size-10 rounded-full bg-base-300">
                             <img
-                              src={notification.recipient.profilePic}
+                              src={notification.recipient.profilePic || getAvatarFallback(notification.recipient.fullName)}
                               alt={notification.recipient.fullName}
                               loading="lazy"
                               onError={(e) => {
-                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(notification.recipient.fullName)}&background=random`;
+                                e.currentTarget.src = getAvatarFallback(notification.recipient.fullName);
                               }}
                             />
                           </div>
@@ -141,3 +141,5 @@ const NotificationPage = () => {
 }
 
 export default NotificationPage
+
+const getAvatarFallback = (name) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || "Echooo User")}`;

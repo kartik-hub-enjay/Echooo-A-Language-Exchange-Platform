@@ -2,6 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 import { LANGUAGE_TO_FLAG } from '../constants';
 
+const getAvatarFallback = (name) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || "Echooo User")}`;
+
 const FriendCard = ({friend}) => {
   return (
     <div className='card bg-base-200 hover:shadow-md transition-shadow h-full'>
@@ -11,12 +13,12 @@ const FriendCard = ({friend}) => {
                 <div className='avatar'>
                     <div className='w-12 h-12 rounded-full overflow-hidden bg-base-300'>
                         <img 
-                            src={friend.profilePic} 
+                            src={friend.profilePic || getAvatarFallback(friend.fullName)} 
                             alt={friend.fullName} 
                             className='w-full h-full object-cover'
                             loading="lazy"
                             onError={(e) => {
-                                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(friend.fullName)}&background=random`;
+                                e.currentTarget.src = getAvatarFallback(friend.fullName);
                             }}
                         />
                     </div>

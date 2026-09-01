@@ -6,6 +6,8 @@ import { logout } from '../lib/api';
 import { BellIcon, LogOutIcon, ShipWheelIcon } from 'lucide-react';
 import ThemeSelector from './ThemeSelector';
 
+const getAvatarFallback = (name) => `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(name || "Echooo User")}`;
+
 const Navbar = () => {
     const {authUser} = useAuthUser();
     const location = useLocation();
@@ -44,7 +46,14 @@ const Navbar = () => {
 
                 <div className='avatar'>
                     <div className='w-9 rounded-full'>
-                        <img src={authUser?.profilePic} alt="User Avatar" rel="noreferrer" />
+                        <img
+                            src={authUser?.profilePic || getAvatarFallback(authUser?.fullName)}
+                            alt="User Avatar"
+                            rel="noreferrer"
+                            onError={(e) => {
+                                e.currentTarget.src = getAvatarFallback(authUser?.fullName);
+                            }}
+                        />
                     </div>
                 </div>
                 {/* Logout Button */}
